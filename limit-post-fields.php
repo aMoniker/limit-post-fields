@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Limit Post Fields
-Version: 0.1-alpha
+Version: 0.0.1
 Description: Limit the length of post fields, meta fields, and ACF fields.
 Author: Jim Greenleaf
 Author URI: http://jim.greenle.af
@@ -10,3 +10,16 @@ Text Domain: limit-post-fields
 Domain Path: /languages
 License: AGPL3 http://www.gnu.org/licenses/agpl.html
 */
+
+class LimitPostFields
+{
+    public static function get_rules()
+    {
+        return array();
+    }
+
+    public static function set_rules()
+    {
+        
+    }
+}
