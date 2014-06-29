@@ -1,0 +1,9 @@
+body.wp-admin.settings_page_limit-post-fields .field-limits .field-limit .title {
+    width: 80px;
+    display: inline-block;
+    text-align: right;
+}
+
+body.wp-admin.settings_page_limit-post-fields .field-limits .field-limit .limit-input {
+    width: 100px;
+}
