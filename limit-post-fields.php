@@ -16,6 +16,60 @@ define('LIMITPOSTFIELDS_URL', plugin_dir_url(__FILE__));
 
 class LimitPostFields
 {
+    private $settings;
+
+    public function __construct()
+    {
+        add_action('admin_enqueue_scripts', array($this, 'edit_page_assets'));
+    }
+
+    public function edit_page_assets($hook)
+    {
+        if (!in_array($hook, array('post-new.php', 'post.php', 'edit.php'))) {
+            return;
+        }
+
+        global $post;
+        if (!$post || !in_array($post->post_type, self::get_valid_post_types())) {
+            return;
+        }
+
+        $this->settings = get_option(self::get_settings_name($post->post_type));
+
+        wp_enqueue_style(
+            'limitpostfields-edit-page-jqueryui-progressbar-css',
+            LIMITPOSTFIELDS_URL . '/css/jquery-ui-progressbar.min.css',
+            null,
+            '0.0.1'
+        );
+
+        wp_enqueue_style(
+            'limitpostfields-edit-page-css',
+            LIMITPOSTFIELDS_URL . '/css/edit-page.css',
+            null,
+            '0.0.1'
+        );
+
+        wp_enqueue_script(
+            'limitpostfields-edit-page-js',
+            LIMITPOSTFIELDS_URL . '/js/edit-page.js',
+            array('jquery', 'jquery-ui-progressbar'),
+            '0.0.1'
+        );
+
+        add_action('admin_footer', array($this, 'edit_page_footer_js'));
+    }
+
+    public function edit_page_footer_js()
+    {
+        ?><script type="text/javascript">
+            window.limitpostfields = window.limitpostfields || {};
+            window.limitpostfields.settings = <?php
+                echo json_encode($this->settings);
+            ?>;
+        </script><?php
+    }
+
     public static function get_rules()
     {
         return array();
@@ -91,6 +145,13 @@ class LimitPostFields
 
         return $valid_post_type_fields;
     }
+
+    public static function get_settings_name($post_type)
+    {
+        return "limitsettingsfields_posttype_$post_type";
+    }
 }
+
+new LimitPostFields;
 
 include_once LIMITPOSTFIELDS_DIR . '/inc/settings-page.php';

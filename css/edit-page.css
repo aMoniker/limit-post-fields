@@ -1,0 +1,45 @@
+.limitpostfields.progress-bar {
+    position: relative;
+    height: 15px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: 0;
+    box-shadow: 0 -1px 1px -1px rgba(0,0,0,0.4);
+}
+
+.limitpostfields.progress-bar .progress-count {
+    position: absolute;
+    top: 0;
+    left: 5px;
+    font-size: 11px;
+    line-height: 14px;
+    color: #eee;
+}
+
+.limitpostfields.progress-bar.empty .progress-count {
+    color: #ddd;
+}
+
+.limitpostfields.progress-bar.full .progress-count {
+    color: #000;
+}
+
+.limitpostfields.progress-bar.overfilled {
+    border-color: red;
+}
+
+.limitpostfields.progress-bar.overfilled .ui-progressbar-value {
+    background: red;
+    border-color: red;
+}
+
+.limitpostfields.progress-bar .progress-used:after {
+    content: '/';
+    padding-right: 2px;
+    padding-left: 3px;
+}
+
+.limitpostfields.progress-bar .ui-progressbar-value {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}

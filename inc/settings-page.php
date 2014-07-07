@@ -54,7 +54,7 @@ final class LimitPostFieldsSettings
             $pto = get_post_type_object($post_type);
             if (!$pto) { continue; } // the pto has disbanded
 
-            $settings_field_name = $this->get_settings_field_name($post_type);
+            $settings_field_name = LimitPostFields::get_settings_name($post_type);
 
             add_settings_field(
                 $settings_field_name,
@@ -84,7 +84,7 @@ final class LimitPostFieldsSettings
     {
         $div_id = "limitpostfields_field_type_$name";
         $valid_fields = LimitPostFields::get_valid_post_type_fields($name);
-        $settings_field_name = $this->get_settings_field_name($name);
+        $settings_field_name = LimitPostFields::get_settings_name($name);
 
         $saved_settings = get_option($settings_field_name);
 
@@ -115,11 +115,6 @@ final class LimitPostFieldsSettings
                 endforeach; ?>
             </div>
         </div><?php
-    }
-
-    private function get_settings_field_name($post_type)
-    {
-        return "limitsettingsfields_posttype_$post_type";
     }
 }
 
