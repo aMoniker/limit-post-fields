@@ -161,22 +161,22 @@ class LimitPostFields
 
         $valid_acf_fields = array();
         foreach ($acf_field_groups as $acf_id) {
-            // $post = get_post($acf_id);
-            $meta = get_metadata('post', $acf_id);
+            $fields = apply_filters('acf/field_group/get_fields', array(), $acf_id);
 
-            foreach ($meta as $key => $value) {
-                if (!preg_match('/^field_/', $key)) { continue; }
-                if (!$value || !is_array($value))   { continue; }
+            foreach ($fields as $field) {
+                if (!$field
+                 || !isset($field['key'])
+                 || !isset($field['type'])
+                 || !preg_match('/^field_/', $field['key'])
+                 || !is_array($field)
+                ) {
+                    continue;
+                }
 
-                $value = maybe_unserialize($value[0]);
-
-                if (!is_array($value)) { continue; }
-                if (!isset($value['key']) || !isset($value['type'])) { continue; }
-
-                if (in_array($value['type'], array(
+                if (in_array($field['type'], array(
                     'text', 'textarea', 'wysiwyg',
                 ))) {
-                    $valid_acf_fields[$value['key']] = $value['label'];
+                    $valid_acf_fields[$field['key']] = $field['label'];
                 }
             }
         }
