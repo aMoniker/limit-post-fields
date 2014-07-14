@@ -3,17 +3,23 @@ jQuery(function($) {
 if (!window.limitpostfields || !window.limitpostfields.settings) { return; }
 
 var LimitedField = Class.extend({
-     bar_element: undefined
-    ,element: undefined
-    ,progress_bar_html: [
-        '<div class="progress-bar limitpostfields">',
-            '<span class="progress-count">',
-                '<span class="progress-used">0</span><span class="progress-total"></span>',
-            '</span>',
-        '</div>',
-    ].join('\n')
-    ,init: function(max_length) {
+     defaults: {
+         element: undefined
+        ,progress_bar_html: [
+            '<div class="progress-bar limitpostfields">',
+                '<span class="progress-count">',
+                    '<span class="progress-used">0</span><span class="progress-total"></span>',
+                '</span>',
+            '</div>',
+        ].join('\n')
+    }
+    ,init: function(max_length, args) {
         this.max_length = max_length;
+
+        args = args || {};
+        $.each(this.defaults, $.proxy(function(key, val) {
+            this[key] = args[key] || val;
+        }, this));
 
         var $progress_bar = $(this.progress_bar_html).progressbar({
             max: this.max_length,
@@ -46,9 +52,8 @@ var LimitedField = Class.extend({
     ,update_watcher: function(callback) {}
 });
 
-var LimitedTitleField = LimitedField.extend({
-     element: '#title'
-    ,create_callback: function(e, ui) {
+var LimitedTextField = LimitedField.extend({
+     create_callback: function(e, ui) {
         $(this.element).attr('maxlength', this.max_length);
         this._super();
     }
@@ -70,8 +75,6 @@ var LimitedContentField = LimitedField.extend({
         var bottom_margin = $element.css('margin-bottom');
 
         $element.css({ 'margin-bottom': '0' });
-
-        console.log('create callback', e, ui);
         $(e.target).css('margin-bottom', bottom_margin);
         $(this.text_element).attr('maxlength', this.max_length);
 
@@ -202,12 +205,23 @@ $.each(window.limitpostfields.settings, function(field, limit) {
 
     if (field.match(/^field_/)) { // acf field
         var $field = $('[name="fields[' +field+ ']"]');
-        console.log('field', $field);
+        var type = $field.attr('type');
+
+        if (type === 'text') {
+            new LimitedTextField(limit, {
+                element: '#' + $field.attr('id')
+            });
+        }
+
+        return;
     }
 
     switch (field) {
         case 'title':
-            new LimitedTitleField(limit); break;
+            new LimitedTextField(limit, {
+                element: '#title'
+            });
+            break;
         case 'editor':
             new LimitedContentField(limit); break;
         case 'excerpt':
