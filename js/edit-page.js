@@ -213,10 +213,17 @@ $.each(window.limitpostfields.settings, function(field, limit) {
 
     if (field.match(/^field_/)) { // acf field
         var $field = $('[name="fields[' +field+ ']"]');
+        var $container = $field.closest('.field');
+        var is_wysiwyg = $container.hasClass('field_type-wysiwyg');
         var type = $field.attr('type');
         var element_type = $field.prop('tagName').toLowerCase();
 
-        if (type === 'text') {
+        if (is_wysiwyg) {
+            new LimitedTinyMCEField(limit, {
+                 element: '#' + $container.attr('id')
+                ,text_element: '#' + $field.attr('id')
+            });
+        } else if (type === 'text') {
             new LimitedTextField(limit, {
                 element: '#' + $field.attr('id')
             });
