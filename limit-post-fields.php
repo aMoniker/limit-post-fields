@@ -51,9 +51,16 @@ class LimitPostFields
         );
 
         wp_enqueue_script(
+            'limitpostfields-class-js',
+            LIMITPOSTFIELDS_URL . '/js/class.js',
+            null,
+            '0.0.1'
+        );
+
+        wp_enqueue_script(
             'limitpostfields-edit-page-js',
             LIMITPOSTFIELDS_URL . '/js/edit-page.js',
-            array('jquery', 'jquery-ui-progressbar'),
+            array('jquery', 'jquery-ui-progressbar', 'limitpostfields-class-js'),
             '0.0.1'
         );
 
