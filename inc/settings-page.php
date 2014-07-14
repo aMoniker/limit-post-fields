@@ -100,15 +100,15 @@ final class LimitPostFieldsSettings
         ?><div id="<?php echo $div_id; ?>">
             <div class="field-limits"><?php
                 foreach ($this->valid_fields[$name] as $fields_type => $fields):
-                    foreach ($fields as $field):
-                    $value = isset($saved_settings[$field])
-                           ? $saved_settings[$field]
+                    foreach ($fields as $field_id => $field_label):
+                    $value = isset($saved_settings[$field_id])
+                           ? $saved_settings[$field_id]
                            : ''
                            ;
                     ?><div class="field-limit">
                         <label>
-                            <span class="title"><?php echo $field; ?></span>
-                            <input type="number" class="limit-input" name="<?php echo $settings_field_name; ?>[<?php echo $field; ?>]" step="1" min="0" placeholder="0" value="<?php echo $value; ?>">
+                            <span class="title"><?php echo $field_label; ?></span>
+                            <input type="number" class="limit-input" name="<?php echo $settings_field_name; ?>[<?php echo $field_id; ?>]" step="1" min="0" placeholder="0" value="<?php echo $value; ?>">
                         </label>
                     </div><?php
                     endforeach;

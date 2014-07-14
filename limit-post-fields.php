@@ -120,6 +120,12 @@ class LimitPostFields
 
         if (!$post_type) { return $valid_post_type_fields; }
 
+        $post_labels = array(
+            'title' => 'Title',
+            'editor' => 'Content',
+            'excerpt' => 'Excerpt',
+        );
+
         // add the builtin post fields (title, editor, excerpt)
         $builtin_fields = apply_filters(
             'limitpostfields/validposttypefields/builtin',
@@ -133,15 +139,44 @@ class LimitPostFields
                 $valid_post_type_fields['builtin'] = array();
             }
 
-            $valid_post_type_fields['builtin'][] = $builtin_field;
+            $valid_post_type_fields['builtin'][$builtin_field] = $post_labels[$builtin_field];
         }
 
         // add any custom meta boxes that have been added
         // TODO - is this worth it? custom meta boxes can change quite a bit...
 
         // add any applicable ACF fields
-        // TODO - this is more difficult than I thought since there are so
-        //        many rules that have to be taken into account for ACF field visibility
+        $acf_field_groups = apply_filters(
+            'acf/location/match_field_groups',
+            array(),
+            array('post_type' => $post_type)
+        );
+
+        $valid_acf_fields = array();
+        foreach ($acf_field_groups as $acf_id) {
+            // $post = get_post($acf_id);
+            $meta = get_metadata('post', $acf_id);
+
+            foreach ($meta as $key => $value) {
+                if (!preg_match('/^field_/', $key)) { continue; }
+                if (!$value || !is_array($value))   { continue; }
+
+                $value = maybe_unserialize($value[0]);
+
+                if (!is_array($value)) { continue; }
+                if (!isset($value['key']) || !isset($value['type'])) { continue; }
+
+                if (in_array($value['type'], array(
+                    'text', 'textarea', 'wysiwyg',
+                ))) {
+                    $valid_acf_fields[$value['key']] = $value['label'];
+                }
+            }
+        }
+
+        if ($valid_acf_fields) {
+            $valid_post_type_fields['acf'] = $valid_acf_fields;
+        }
 
         return $valid_post_type_fields;
     }
