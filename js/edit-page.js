@@ -67,9 +67,36 @@ var LimitedTextField = LimitedField.extend({
     }
 });
 
-var LimitedContentField = LimitedField.extend({
-     element: '#postdivrich'
-    ,text_element: '#content'
+var LimitedTextareaField = LimitedField.extend({
+     init: function(max_length, args) {
+        this.defaults = $.extend(this.defaults, {
+            text_element: null
+        });
+        this._super(max_length, args);
+    }
+    ,create_callback: function(e, ui) {
+        $(this.text_element).attr('maxlength', this.max_length);
+        var bottom_margin = $(this.element).css('margin-bottom');
+        $(this.element).css({ 'margin-bottom': '0' });
+        $(e.target).css('margin-bottom', bottom_margin);
+    }
+    ,update_watcher: function(callback) {
+        $(this.text_element)
+            .on('change keyup', function() {
+                callback($(this).val().length);
+            })
+            .trigger('keyup')
+            ;
+    }
+});
+
+var LimitedTinyMCEField = LimitedField.extend({
+     init: function(max_length, args) {
+        this.defaults = $.extend(this.defaults, {
+            text_element: null
+        });
+        this._super(max_length, args);
+    }
     ,create_callback: function(e, ui) {
         var $element = $(this.element);
         var bottom_margin = $element.css('margin-bottom');
@@ -177,25 +204,6 @@ var LimitedContentField = LimitedField.extend({
     }
 });
 
-var LimitedExcerptField = LimitedField.extend({
-     element: '#postexcerpt'
-    ,text_element: '#excerpt'
-    ,create_callback: function(e, ui) {
-        $(this.text_element).attr('maxlength', this.max_length);
-        var bottom_margin = $(this.element).css('margin-bottom');
-        $(this.element).css({ 'margin-bottom': '0' });
-        $(e.target).css('margin-bottom', bottom_margin);
-    }
-    ,update_watcher: function(callback) {
-        $(this.text_element)
-            .on('change keyup', function() {
-                callback($(this).val().length);
-            })
-            .trigger('keyup')
-            ;
-    }
-});
-
 
 // initialize all the progressbars accoring to
 // the fields defined in the global object
@@ -206,10 +214,16 @@ $.each(window.limitpostfields.settings, function(field, limit) {
     if (field.match(/^field_/)) { // acf field
         var $field = $('[name="fields[' +field+ ']"]');
         var type = $field.attr('type');
+        var element_type = $field.prop('tagName').toLowerCase();
 
         if (type === 'text') {
             new LimitedTextField(limit, {
                 element: '#' + $field.attr('id')
+            });
+        } else if (element_type === 'textarea') {
+            new LimitedTextareaField(limit, {
+                 element: '#' + $field.attr('id')
+                ,text_element: '#' + $field.attr('id')
             });
         }
 
@@ -220,12 +234,17 @@ $.each(window.limitpostfields.settings, function(field, limit) {
         case 'title':
             new LimitedTextField(limit, {
                 element: '#title'
-            });
-            break;
+            }); break;
         case 'editor':
-            new LimitedContentField(limit); break;
+            new LimitedTinyMCEField(limit, {
+                 element: '#postdivrich'
+                ,text_element: '#content'
+            }); break;
         case 'excerpt':
-            new LimitedExcerptField(limit); break;
+            new LimitedTextareaField(limit, {
+                 element: '#postexcerpt'
+                ,text_element: '#excerpt'
+            }); break;
         default: break;
     }
 });

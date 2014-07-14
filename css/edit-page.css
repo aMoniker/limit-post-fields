@@ -43,3 +43,7 @@
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+.postbox.acf_postbox .field_type-textarea textarea + .progress-bar {
+    margin-top: -4px;
+}
