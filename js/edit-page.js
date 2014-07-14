@@ -93,7 +93,8 @@ var LimitedTextareaField = LimitedField.extend({
 var LimitedTinyMCEField = LimitedField.extend({
      init: function(max_length, args) {
         this.defaults = $.extend(this.defaults, {
-            text_element: null
+             text_element: null
+            ,tinymce_id: null
         });
         this._super(max_length, args);
     }
@@ -130,7 +131,7 @@ var LimitedTinyMCEField = LimitedField.extend({
         var editor_hooked = false;
 
         $.each(tinyMCE.editors, $.proxy(function(i, ed) {
-            if (!ed.id || ed.id !== 'content') { return; }
+            if (!ed.id || ed.id !== this.tinymce_id) { return; }
 
             editor_hooked = true;
 
@@ -197,6 +198,7 @@ var LimitedTinyMCEField = LimitedField.extend({
     }
     ,tinymce_get_trimmed_length: function(ed) {
         var content = ed.getContent({ format: 'text' });
+        content = $('<textarea>').html(content).text(); // html entity decode
         content = content.replace(/\n/, '');
         content = content.replace(/^\s+/, '');
         content = content.replace(/\s+$/, '');
@@ -213,6 +215,7 @@ $.each(window.limitpostfields.settings, function(field, limit) {
 
     if (field.match(/^field_/)) { // acf field
         var $field = $('[name="fields[' +field+ ']"]');
+        var field_id = $field.attr('id');
         var $container = $field.closest('.field');
         var is_wysiwyg = $container.hasClass('field_type-wysiwyg');
         var type = $field.attr('type');
@@ -220,17 +223,18 @@ $.each(window.limitpostfields.settings, function(field, limit) {
 
         if (is_wysiwyg) {
             new LimitedTinyMCEField(limit, {
-                 element: '#' + $container.attr('id')
-                ,text_element: '#' + $field.attr('id')
+                 element: '#' + $field.closest('.acf_wysiwyg').attr('id')
+                ,text_element: '#' + field_id
+                ,tinymce_id: field_id
             });
         } else if (type === 'text') {
             new LimitedTextField(limit, {
-                element: '#' + $field.attr('id')
+                element: '#' + field_id
             });
         } else if (element_type === 'textarea') {
             new LimitedTextareaField(limit, {
-                 element: '#' + $field.attr('id')
-                ,text_element: '#' + $field.attr('id')
+                 element: '#' + field_id
+                ,text_element: '#' + field_id
             });
         }
 
@@ -246,6 +250,7 @@ $.each(window.limitpostfields.settings, function(field, limit) {
             new LimitedTinyMCEField(limit, {
                  element: '#postdivrich'
                 ,text_element: '#content'
+                ,tinymce_id: 'content'
             }); break;
         case 'excerpt':
             new LimitedTextareaField(limit, {
